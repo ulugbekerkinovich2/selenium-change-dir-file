@@ -167,6 +167,6 @@ def my_selen():
         print('tugadi')
 
 # shutil.move('/Users/billy/d1/xfile.txt', '/Users/billy/d2/xfile.txt')
-
+#indeks_file = [d for d in range(0, len(cycle)) if cycle[d] == "Файл"]
 # driver.quit()
 my_selen()
