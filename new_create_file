@@ -1,0 +1,226 @@
+import os
+import shutil
+import time
+import requests
+import psycopg2
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium_stealth import stealth
+
+options = webdriver.ChromeOptions()
+options.add_experimental_option("excludeSwitches", ["enable-automation"])
+options.add_experimental_option('useAutomationExtension', False)
+options.headless = True
+connection = psycopg2.connect(
+    host="127.0.0.1",
+    database="postgres9",
+    user="postgres",
+    password="0852")
+# def telebots(mess):
+#     requests.get(
+#         url=f"https://api.telegram.org/bot5082135962:AAGhUTECboqGDnU8gAtY8kK8VgWUbdjmeVc/sendMessage?chat_id=935920479&parse_mode=HTML&text={mess}")
+
+# def telebots_2(mess, mess1):
+#     requests.get(
+#         url=f"https://api.telegram.org/bot5082135962:AAGhUTECboqGDnU8gAtY8kK8VgWUbdjmeVc/sendMessage?chat_id=935920479&parse_mode=HTML&text={mess}\n{mess1}")
+
+def my_selen():
+    driver = webdriver.Chrome(options=options)
+    stealth(
+        driver,
+        languages=["en-US", "en"],
+        vendor="Google Inc.",
+        platform="Win32",
+        webgl_vendor="Intel Inc.",
+        renderer="Intel Iris OpenGL Engine",
+        fix_hairline=True,
+    )
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM my")
+    all_data = cursor.fetchall()
+    input_link = all_data[-1][1]
+    replace_folder_path = all_data[-1][2]
+    print(input_link, '111')
+    # telebots_2(input_link, '111')
+    print(replace_folder_path, '222')
+    # telebots_2(replace_folder_path, '222')
+    # input_link = "https://intranet.ytit.uz/course/view.php?id=2877"
+    # replace_folder_path = ''
+
+    driver.get("https://intranet.ytit.uz/login/index.php")
+    driver.find_element(By.NAME, 'username').send_keys('ier20037')
+    time.sleep(1.5)
+    driver.find_element(By.NAME, 'password').send_keys('AC2558243')
+    time.sleep(1.5)
+    button = driver.find_element(By.XPATH,
+                                 '/html/body/div[1]/div[3]/div/div/section/div/div[2]/div/div[2]/div[1]/form/button')
+    button.click()
+    time.sleep(1)
+    driver.get(input_link)
+    time.sleep(1)
+    driver.refresh()
+    all_data = driver.find_element(By.XPATH, '//*[@id="region-main"]').text
+    data = all_data.split(' ')
+    data1 = ' '.join(map(str, data))
+    data2 = data1.split('\n')
+    fake_data = ['Ваши достижения', 'Тематический план', 'Объявления', 'Форум', 'Общее', '']
+    all_texts = []
+    for i in data2:
+        if i not in fake_data:
+            all_texts.append(i)
+
+    # print(all_texts)
+
+    all_data = driver.find_element(By.XPATH, '//*[@id="region-main"]').text
+    data = all_data.split(' ')
+    # data1 = ' '.join(map(str, data))
+    # data2 = data1.split('\n')
+    all_h3 = []
+    # h3 = driver.find_elements(By.TAG_NAME, 'h3')
+    h3 = driver.find_elements(By.CLASS_NAME, 'sectionname')
+    for i in h3:
+        if i.text == '':
+            continue
+        if i.text == 'Click here!':
+            continue
+        if i.text == 'Final Exam':
+            continue
+        if i.text == 'videolar':
+            continue
+        if i.text == 'Final exam':
+            continue
+        if i.text == "Fan bo'yicha umumiy ma'lumotlar":
+            continue
+        # if i.text in 'Общее':
+        #     continue
+        # if i.text ==  'Фото':
+        #     continue
+
+        # print(i.text, 'h3 tags')
+
+        all_h3.append(i.text)
+        # print("i.text", i.text)
+        # print(all_texts[45], all_texts[46], all_texts[47], all_texts[48])
+        # else:
+        #     continue
+    print(all_h3)
+    # telebots(all_h3)
+
+    f_data = []
+
+    for el in all_h3:
+        indeks_of_week = [i for i in range(0, len(all_texts)) if el == all_texts[i]]
+        # print("indeks_of_week", indeks_of_week)
+        for i in indeks_of_week:
+            # print('ii', i)
+            if i not in f_data:
+                f_data.append(i)
+                # print("f_data1", f_data)
+    try:
+        for k in range(0, len(f_data) + 1):
+            if all_texts[f_data[k]] == all_texts[f_data[k + 1]]:
+                del f_data[k + 1]
+                print('delete', f_data[k + 1])
+                # telebots_2('delete', f_data[k + 1])
+    except:
+        print('bajarildi')
+        # telebots('bajarildi')
+
+    print(f_data)
+    # telebots(f_data)
+    # replace_folder_path = "D:\LMS_FILES\Advertising-uzbek"
+    all_files = []
+    list_of_files = filter(lambda x: os.path.isfile(os.path.join(replace_folder_path, x)),
+                           os.listdir(replace_folder_path))
+    list_of_files = sorted(list_of_files, key=lambda x: os.path.getmtime(os.path.join(replace_folder_path, x)))
+    for file_name in list_of_files:
+        all_files.append(file_name)
+    # print(all_files)
+    # parent_dir = 'D:\est2'
+    parent_dir = 'D:\master_degree'
+    # directory1 = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/header/div/div/div/div[1]/div[1]/div/div').text
+    directory1 = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/header/div/div/div/div[1]/div[1]/div/div/h1').text
+    print("directory1", directory1)
+    # directory1 = replace_folder_path.split("\\")[-1]   # .replace('/', '').replace(':', '')
+    # directory1 = str(random.randint(1, 1000))
+    # print(directory1.replace('..', ''))...............
+    path = os.path.join(parent_dir, directory1.replace('..', ''))
+    os.mkdir(path)
+    print('os ga', len(all_h3))
+    # telebots(len(all_h3))
+    extra = []
+    count = 1
+    for i in all_h3:
+        print('i', i, 'shu')
+        # telebots(i)
+        parent_dir1 = f"{parent_dir}\{directory1}"
+        parent_dir2 = f"""{parent_dir}\{directory1}\{i.replace(':', '').replace('(', '').replace(')', '').replace('*', '').replace('"','').replace('/','').replace('?','').replace('..','')}"""
+        extra.append(parent_dir2.replace('\\', '/').replace('..', ''))
+        path1 = os.path.join(parent_dir1, i.replace(':', '').replace('(', '').replace(')', '').replace('*', '').replace('"','').replace('/','').replace('?', '').replace('..', ''))
+        try:
+            os.mkdir(path1.replace('..', '').replace('/', ''))
+        except:
+            path1 = os.path.join(parent_dir1, f'{count}_'+i.replace(':', '').replace('(', '').replace(')', '').replace('*','').replace('"','').replace('/','').replace('?','').replace('..',''))
+            os.mkdir(path1.replace('..', '').replace('/', ''))
+            count += 1
+    print(extra)
+    # telebots(extra)
+    try:
+        print(all_h3)
+        for i in range(0, len(all_h3)):
+            print('bu sikl', i)
+            if f_data[i] == f_data[-1]:
+                cycle = all_texts[all_data[i]:]
+                print('555', f_data[i], f_data[-1])
+            if i > 0 and f_data[0] == 0:
+                cycle = all_texts[f_data[i]:f_data[i + 1]]
+            if i == 0 and f_data[0] != 0:
+                cycle = all_texts[0:f_data[i]]
+            if i != 0 and f_data[0] != 0:
+                cycle = all_texts[f_data[i-1]:f_data[i]]
+            if i == 0 and f_data[i] == 0:
+                cycle = all_texts[f_data[i]:f_data[i + 1]]
+            if (len(cycle) >= 2) or ('Файл' in cycle):
+                all1 = []
+                print("cycle", cycle)
+                # telebots(cycle)
+                all_sizes1 = []
+                arr4 = ['Видео-урок', 'Видеоурок.', 'Proyeksiyalash mashqlar', 'Гиперссылка', 'Узбекистан',
+                        ]
+
+                indeks_file = [d for d in range(0, len(cycle)) if cycle[d].strip() in "Файл"]
+                for u in indeks_file:
+                    if cycle[u].strip() == 'Файл' and (cycle[u - 1].strip().replace('"','') not in arr4 or cycle[u-1] not in arr4):
+                        all_file = f"{replace_folder_path}\{all_files[0]}"
+                        print("all_file", all_file)
+                        # telebots(all_file)
+                        all1.append(all_file)
+                        del all_files[0]
+                    else:
+                        continue
+                parent_dir1 = f"{parent_dir}\{directory1}"
+                # print(all1)
+                # print("extra", extra)
+                list_of_files = filter(lambda x: os.path.isfile(os.path.join(replace_folder_path, x)),
+                                       os.listdir(replace_folder_path))
+                list_of_files = sorted(list_of_files,
+                                       key=lambda x: os.path.getmtime(os.path.join(replace_folder_path, x)))
+                for file, file_name in zip(all1, list_of_files):
+                    # print(file)
+                    try:
+                        shutil.copy(file, extra[i].replace(' .', '').strip())
+                        print(' ✅ file copied')
+                        time.sleep(0.3011)
+                        # telebots(' ✅ file copied')
+                    except:
+                        print('❌ fayl yuklanmadi')
+                        # telebots('❌ fayl yuklanmadi')
+    except:
+        print('tugadi')
+
+
+# shutil.move('/Users/billy/d1/xfile.txt', '/Users/billy/d2/xfile.txt')
+
+# driver.quit()
+my_selen()
